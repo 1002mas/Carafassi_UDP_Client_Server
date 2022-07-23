@@ -33,7 +33,7 @@ class UDP_Server:
         
         
     def __list(self, sock, address):
-        message='2000'
+        message=''
         for f in listdir(self.__RES_DIR):
             if isfile(join(self.__RES_DIR,f)):
                 message=message+f+'\n'

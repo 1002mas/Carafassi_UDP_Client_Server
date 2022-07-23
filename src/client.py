@@ -47,11 +47,7 @@ class UDP_Client:
         message='list'
         sock.sendto(message.encode('utf8'),(self.__connection_address, self.__connection_port))
         a=self.__receiveMessage(sock, True)
-        if self.__isCodeCorrect(a):  
-            a=a[4:len(a)]
-            print(a)
-        else:
-            print('File list could not be provided')
+        print(a)
             
     def __get(self, sock, message):
         sock.sendto(message.encode('utf8'),(self.__connection_address, self.__connection_port))
@@ -62,6 +58,7 @@ class UDP_Client:
             try:
                 file=open(join(self.__RES_DIR,filename),'wb')
                 file.write(a)
+                print('File downloaded')
             except Exception as e:
                 print(e)
             finally:
