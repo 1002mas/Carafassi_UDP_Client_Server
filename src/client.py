@@ -12,7 +12,6 @@ class UDP_Client:
     __connection_address=0
     __buff_size=0
     __stop_connection=False
-    #list
     #get nome file con gestione errore
     #put nome file, con ricezione risposta
     
@@ -21,6 +20,12 @@ class UDP_Client:
         self.__connection_port=connection_port
         self.__buff_size=4096
     
+    def __list(self, sock):
+        message='list'
+        sock.sendto(message.encode('utf8'),(self.__connection_address, self.__connection_port))
+        data, address=sock.recvfrom(self.__buff_size)
+        print('%s' %data.decode('utf8'))
+            
     def run(self):
         print("Trying to connect to %s:%d" % (self.__connection_address, self.__connection_port))
         sock=sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
@@ -32,7 +37,7 @@ class UDP_Client:
             text=input('> ')
             command=text.split(' ')[0].lower()
             if command.__eq__(self.__COMMAND_LIST):
-                print('LIST')
+                self.__list(sock)
             elif command.__eq__(self.__COMMAND_GET):
                 print('GET')
             elif command.__eq__(self.__COMMAND_PUT):
@@ -55,11 +60,6 @@ class UDP_Client:
         sock.close()
         print('Client shutting down')
         
-        def __list(self, sock):
-            message='list'
-            sock.sendto(message.encode('utf8'),sock)
-            data, address=sock.recvfrom(self.__buff_size)
-            print('%s' %data.decode('utf8'))
 
 c= UDP_Client('localhost', 10000)
 c.run()
