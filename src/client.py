@@ -21,7 +21,7 @@ class UDP_Client:
     def __init__(self, connection_address, connection_port):
         self.__connection_address=connection_address
         self.__connection_port=connection_port
-        self.__buff_size=4096
+        self.__buff_size=32768
     
     #get all packets and join them in a single message
     def __receiveMessage(self, sock, isUtf8):

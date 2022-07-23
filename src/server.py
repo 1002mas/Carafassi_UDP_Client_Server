@@ -18,7 +18,7 @@ class UDP_Server:
     def __init__(self):
         self.__address='localhost'
         self.__port=10000
-        self.__buff_size=4096
+        self.__buff_size=32768
     
     def __createPackages(self, message):
         res=[]
