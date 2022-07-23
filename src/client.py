@@ -20,11 +20,20 @@ class UDP_Client:
         self.__connection_port=connection_port
         self.__buff_size=4096
     
+    def __receiveMessage(self, sock):
+        data, address=sock.recvfrom(self.__buff_size)
+        numPac=int(data.decode('utf8'))
+        res=''
+        for i in range(numPac):
+            data, address=sock.recvfrom(self.__buff_size)
+            res=res+data.decode('utf8')
+        return res
+    
     def __list(self, sock):
         message='list'
         sock.sendto(message.encode('utf8'),(self.__connection_address, self.__connection_port))
-        data, address=sock.recvfrom(self.__buff_size)
-        print('%s' %data.decode('utf8'))
+        a=self.__receiveMessage(sock)
+        print(a)
             
     def run(self):
         print("Trying to connect to %s:%d" % (self.__connection_address, self.__connection_port))
