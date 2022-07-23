@@ -66,7 +66,7 @@ class UDP_Server:
            message=b''.join([message,fileContent])
            print('get request: valid')
         else:
-           message='1001'.encode('utf8')
+           message='1001File not avaiable'.encode('utf8')
            print('get request: not valid')
            
         p=self.__createPackages(message)
@@ -90,9 +90,7 @@ class UDP_Server:
         return res
     
     def __put(self, sock, address, filename):
-        print(2)
         a=self.__receiveMessage(sock, address)
-        print(3)
         try:
             file=open(join(self.__RES_DIR,filename),'wb')
             file.write(a)
@@ -134,7 +132,6 @@ class UDP_Server:
                 elif command.__eq__(self.__COMMAND_PUT):
                     print('put request received')
                     arg=data.decode('utf8')
-                    print(1)
                     self.__put(sock, address, arg[4:len(arg)])
                 else:
                     print('Invalid request received\n')

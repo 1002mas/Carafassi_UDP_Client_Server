@@ -67,7 +67,8 @@ class UDP_Client:
             finally:
                 file.close()
         else:
-            print('File not found')
+            a=a[4:len(a)]
+            print(a.decode('utf8'))
          
     def __doesFileExists(self, filename):
         for f in listdir(self.__RES_DIR):
