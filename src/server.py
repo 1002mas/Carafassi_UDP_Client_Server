@@ -54,7 +54,6 @@ class UDP_Server:
         
     def __get(self, sock, address, filename):
         message='2000'.encode('utf8')
-        print(message)
         if self.__doesFileExists(filename):
            fileContent=''
            try:
@@ -64,8 +63,6 @@ class UDP_Server:
                print(e)
            finally:
                 file.close()
-           print(type(message))
-           print(type(fileContent))
            message=b''.join([message,fileContent])
            print('get request: valid')
         else:
@@ -79,7 +76,33 @@ class UDP_Server:
             sock.sendto(p[i],address)
             time.sleep(self.__SENDING_TIME_OUT)
         
-            
+    #get all packets and join them in a single message
+    def __receiveMessage(self, sock, address):
+        data, address=sock.recvfrom(self.__buff_size)
+        numPac=int(data.decode('utf8'))
+        res=bytes()
+        for i in range(numPac):
+            data, address2=sock.recvfrom(self.__buff_size)
+            if address2.__eq__(address):
+                res=b''.join([res,data])
+            if numPac>1:
+                print('file packets retrieved %d/%d'%(i+1,numPac))
+        return res
+    
+    def __put(self, sock, address, filename):
+        print(2)
+        a=self.__receiveMessage(sock, address)
+        print(3)
+        try:
+            file=open(join(self.__RES_DIR,filename),'wb')
+            file.write(a)
+            sock.sendto('File created'.encode('utf8'),address)
+        except Exception as e:
+            print(e)
+            sock.sendto(e.encode('utf8'),address)
+        finally:
+            file.close()
+    
     def run(self):
         sock=sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
         print('Starting server on %s with port %d\n' %(self.__address, self.__port))
@@ -110,6 +133,9 @@ class UDP_Server:
                     self.__get(sock, address, file)
                 elif command.__eq__(self.__COMMAND_PUT):
                     print('put request received')
+                    arg=data.decode('utf8')
+                    print(1)
+                    self.__put(sock, address, arg[4:len(arg)])
                 else:
                     print('Invalid request received\n')
                     sock.sendto("1000".encode('utf8'),address)

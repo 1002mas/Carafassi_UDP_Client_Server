@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from os import listdir
+from os.path import isfile, join
 import socket as sk
-from os.path import join
+import time
 
 class UDP_Client:
     __COMMAND_LIST='list'
@@ -9,13 +11,12 @@ class UDP_Client:
     __COMMAND_HELP='help'
     __COMMAND_QUIT='quit'
     __RES_DIR=join('..', 'res', 'client')
+    __SENDING_TIME_OUT=0.1
     
     __connection_port=0
     __connection_address=0
     __buff_size=0
     __stop_connection=False
-    #get nome file con gestione errore
-    #put nome file, con ricezione risposta
     
     def __init__(self, connection_address, connection_port):
         self.__connection_address=connection_address
@@ -67,6 +68,48 @@ class UDP_Client:
                 file.close()
         else:
             print('File not found')
+         
+    def __doesFileExists(self, filename):
+        for f in listdir(self.__RES_DIR):
+            if isfile(join(self.__RES_DIR,f)) and f.__eq__(filename):
+                return True
+        return False
+    
+    def __createPackages(self, message):
+        res=[]
+        it=round((len(message)/self.__buff_size)+1)
+        e=self.__buff_size
+        
+        for i in range(it):
+            res.append(message[i*self.__buff_size:e])
+            e=e+self.__buff_size 
+            
+        return res
+             
+           
+    def __put(self, sock, message, filename):
+        sock.sendto(message.encode('utf8'),(self.__connection_address, self.__connection_port))
+        if self.__doesFileExists(filename):
+           fileContent=''
+           try:
+               file=open(join(self.__RES_DIR,filename),'rb')
+               fileContent=file.read()
+           except Exception as e:
+               print(e)
+           finally:
+                file.close()
+           message=fileContent
+           p=self.__createPackages(message)
+           numP=len(p)
+           sock.sendto(str(numP).encode('utf8'),(self.__connection_address, self.__connection_port))
+           for i in range(numP):
+               sock.sendto(p[i],(self.__connection_address,self.__connection_port))
+               time.sleep(self.__SENDING_TIME_OUT)
+               print('sent %d/%d packages' %(i+1,numP))
+           print(sock.recvfrom(self.__buff_size)[0].decode('utf8'))
+        else:
+           print('file not found')
+           
             
     def run(self):
         print("Trying to connect to %s:%d\n" % (self.__connection_address, self.__connection_port))
@@ -80,7 +123,7 @@ class UDP_Client:
             elif command.__eq__(self.__COMMAND_GET):
                 self.__get(sock, text)
             elif command.__eq__(self.__COMMAND_PUT):
-                print('PUT')
+                self.__put(sock,text, text[4:len(text)])
             elif command.__eq__(self.__COMMAND_QUIT):
                 self.__stop_connection=True
             elif command.__eq__(self.__COMMAND_HELP):
