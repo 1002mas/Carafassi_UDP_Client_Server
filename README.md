@@ -28,6 +28,6 @@ Command used to close client socket and exit client.
 
 # DOWNLOAD
 
-Relazione: [DOWNLOAD] (https://github.com/1002mas/Carafassi_UDP_Client_Server/raw/master/relazione.pdf)
+Relazione: [DOWNLOAD](https://github.com/1002mas/Carafassi_UDP_Client_Server/raw/master/relazione.pdf)
 
 ZIP: DOWNLOAD
